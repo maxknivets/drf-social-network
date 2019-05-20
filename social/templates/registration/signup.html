@@ -1,0 +1,36 @@
+<head><title> Sign up </title></head>
+{% extends 'registration/base.html' %}
+{% load staticfiles %}
+
+
+{% block javascript %}
+  <script>
+    $("#id_username").change(function () {
+      var username = $(this).val();
+
+      $.ajax({
+        url: '/ajax/validate_username/',
+        data: {
+          'username': username
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_taken) {
+            alert("A user with this username already exists.");
+            }
+        }
+      });
+
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <span><h2>Sign up</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}</span>
+      <button type="submit">Sign up</button>
+    </form>
+  Have an account? <a href="/login">Log in!</a></span>
+{% endblock %}

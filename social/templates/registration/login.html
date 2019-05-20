@@ -1,0 +1,14 @@
+<head><title> Log in </title></head>
+
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'registration/style.css' %}" />
+
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    <span>{{ form.as_p }}</span>
+    <span><button type="submit">Login</button></span>
+  </form>
+<span>No account? <a href="/signup">Create one!</a></span>
+{% endblock %}
+

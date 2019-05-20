@@ -1,0 +1,17 @@
+{% load static %}<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Default Title{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'registration/style.css' %}">
+    {% block stylesheet %}{% endblock %}
+  </head>
+  <body>
+    <main>
+      {% block content %}
+      {% endblock %}
+    </main>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    {% block javascript %}{% endblock %}
+  </body>
+</html>
