@@ -44,16 +44,27 @@ class GetPostInfo(generics.RetrieveAPIView):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
-class VoteOnPost(generics.CreateAPIView):
-    serializer_class = VoteSerializer
-
-    def get_queryset(self):
-        queryset = Vote.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        user = self.request.user
                
+def vote(request, vote, post_id):
+   if request.user.is_authenticated:
+      post = get_object_or_404(Post, pk=post_id)
+      already_voted = Vote.objects.filter(voted_by=request.user, voted_post=post).first()
+      if already_voted:
+          if already_voted.vote == 'L' and vote != 'L':
+              already_voted.vote = 'D'
+          if already_voted.vote == 'D' and vote != 'D':
+              already_voted.vote = 'L'
+          else:
+              already_voted.delete()
+      else:
+          already_voted = Vote(voted_post=post, voted_by=request.user, vote=vote)
+      already_voted.save()
+      data = {
+          'total_likes': Vote.objects.filter(voted_post=post, vote='L').count(),
+          'total_dislikes': Vote.objects.filter(voted_post=post, vote='D').count()
+      }
+      return JsonResponse(data)
+   return redirect('/')
 
 def edit(request):
     if request.user.is_authenticated and request.method == 'POST':

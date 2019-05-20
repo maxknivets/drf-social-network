@@ -80,11 +80,7 @@ function createPost() {
 
 function like(post_id) {
 	$.ajax({
-		url: '/ajax/vote/',
-		data: {
-			voted_post: post_id
-			vote: 'L'
-		},
+		url: '/ajax/vote/L/'+post_id+'/',
 		dataType: 'json',
 		success: function (data) {
 			if(data){
@@ -106,10 +102,7 @@ function like(post_id) {
 
 function dislike(post_id) {
 	$.ajax({
-		url: '/ajax/dislikes/',
-		data: {
-			post: post_id
-		},
+		url: '/ajax/vote/D/'+post_id+'/',
 		dataType: 'json',
 		success: function (data) {
 			if(data){

@@ -5,11 +5,11 @@ register = template.Library()
 
 @register.simple_tag
 def total_likes(post):
-    return Vote.objects.filter(vote__in=('L')).count()
+    return Vote.objects.filter(voted_post=post, vote='L').count()
 
 @register.simple_tag
 def total_dislikes(post):
-    return Vote.objects.filter(vote__in=('D')).count()
+    return Vote.objects.filter(voted_post=post, vote='D').count()
 
 @register.simple_tag
 def total_followers(user):

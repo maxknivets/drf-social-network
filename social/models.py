@@ -50,7 +50,7 @@ class Followers(models.Model):
 
 class Vote(models.Model):
     voted_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="voted_post")
-    voted_by = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="voted_by")
+    voted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="voted_by")
     LIKE = 'L'
     DISLIKE = 'D'
     choices = (
