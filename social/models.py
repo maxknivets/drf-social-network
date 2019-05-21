@@ -65,7 +65,6 @@ class Vote(models.Model):
     def __str__(self):
         return str(self.voted_post)
 
-
 class Comment(models.Model):
     comment = models.CharField(max_length=1000)
     post_date = models.DateTimeField('Publication Date')

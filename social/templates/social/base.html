@@ -33,10 +33,10 @@
         {% if post.image %} <img src="{{ post.image.url }}" alt="post-image{{ post.pk }}">{% endif %}
         <div class="sub">Posted by <a href="{% url 'social:user' post.user.pk %}">{{ post.user.username }}</a> at {{ post.get_readable_date }}</div><br>
         
-        <img class="main" alt="like" src="{% static 'icons/thumbs-up.svg' %}" onclick="like({{ post.pk }})">
+        <img class="main" alt="like" src="{% static 'icons/thumbs-up.svg' %}" onclick="like({{ post.pk }}, '{{ csrf_token }}')">
         <div id="total_likes{{ post.pk }}" class="like">{% total_likes post %}</div>
         
-        <img class="main" alt="dislike" src="{% static 'icons/thumbs-down.svg' %}" onclick="dislike({{ post.pk }})">
+        <img class="main" alt="dislike" src="{% static 'icons/thumbs-down.svg' %}" onclick="dislike({{ post.pk }}, '{{ csrf_token }}')">
         <div id="total_dislikes{{ post.pk }}" class="dislike">{% total_dislikes post %}</div>
         
         {% if post.user == user %}

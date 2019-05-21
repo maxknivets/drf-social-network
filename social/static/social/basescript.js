@@ -41,8 +41,8 @@ function createPost() {
 
 <li id="post${post_id}"><div class="main" id="post_text${post_id}">${post_text}</div>${post_image}<div class="sub">Posted by <a href="/user/${post_user_id}">${post_username}</a> on ${post_date}</div>
 
-<img class="main" onclick="like(${post_id})" alt="like" src="static/icons/thumbs-up.svg"><div id="total_likes${post_id}" class="like">0</div>
-<img class="main" onclick="dislike(${post_id})" alt="dislike" src="/static/icons/thumbs-down.svg"><div id="total_dislikes${post_id}" class="dislike">0</div>
+<img class="main" onclick="like(${post_id}, ${this.postToken})" alt="like" src="static/icons/thumbs-up.svg"><div id="total_likes${post_id}" class="like">0</div>
+<img class="main" onclick="dislike(${post_id}, ${this.postToken})" alt="dislike" src="/static/icons/thumbs-down.svg"><div id="total_dislikes${post_id}" class="dislike">0</div>
 
 <img class="main" src="/static/icons/pencil-alt.svg" onclick="toggleVisibility('edit${post_id}');">
 <img class="main" alt="delete" src="/static/icons/trash-alt.svg" onclick="toggleVisibility('delete${post_id}');">
@@ -78,12 +78,15 @@ function createPost() {
 
 
 
-function like(post_id) {
+function like(post_id, token) {
 	$.ajax({
-		url: '/ajax/vote/L/'+post_id+'/',
+		url: '/ajax/vote/',
+		data:{ csrfmiddlewaretoken: token, vote: 'L', 'post_id': post_id },
 		dataType: 'json',
+		type:'POST',
 		success: function (data) {
 			if(data){
+			    console.log(data)
 				$(`#total_likes${post_id}`).text(data.total_likes);
  				$(`#total_dislikes${post_id}`).text(data.total_dislikes);
  				console.log('success');
@@ -100,14 +103,18 @@ function like(post_id) {
 
 
 
-function dislike(post_id) {
+function dislike(post_id, token) {
 	$.ajax({
-		url: '/ajax/vote/D/'+post_id+'/',
+		url: '/ajax/vote/',
+		data:{ csrfmiddlewaretoken: token, vote: 'D', 'post_id': post_id },
 		dataType: 'json',
+		type:'POST',
 		success: function (data) {
 			if(data){
+			    console.log(data)
 				$(`#total_likes${post_id}`).text(data.total_likes);
 				$(`#total_dislikes${post_id}`).text(data.total_dislikes);
+				console.log('success');
 			}
 		},
 		error:function (xhr, ajaxOptions, thrownError){

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from social.models import Post, Vote
+from social.models import Post
 
 class PostSerializer(serializers.ModelSerializer):
 
@@ -7,10 +7,4 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = '__all__'
     
-        
-class VoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Vote
-        fields = '__all__'
-        
 
