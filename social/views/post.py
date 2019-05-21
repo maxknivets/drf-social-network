@@ -49,10 +49,10 @@ class GetPostInfo(generics.RetrieveAPIView):
 class VoteOnPost(generics.GenericAPIView):
     queryset = Vote.objects.all()
         
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        post = get_object_or_404(Post, pk=request.POST['post_id'])
-        vote = request.POST['vote']
+        post = get_object_or_404(Post, pk=request.POST.get('post_id'))
+        vote = request.POST.get('vote')
         already_voted = queryset.filter(voted_by=request.user, voted_post=post).first()
         if already_voted:
             if already_voted.vote == 'L' and vote != 'L':
