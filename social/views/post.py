@@ -32,8 +32,11 @@ def post(request):
             return JsonResponse(data)    
     return redirect('/')
 
-
-
+class WritePost(generics.CreateAPIView):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+        
+    
 def databasecheck(request, post_id):
     if request.user.is_authenticated:
         data={'currentId':Post.objects.last().pk, 'lastId':post_id}

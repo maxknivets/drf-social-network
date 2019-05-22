@@ -11,19 +11,12 @@ function toggleVisibility(id) {
 function createPost() {
 	event.preventDefault();
 	var text=$('#post-field').val();
-	var image=$('#id_post_image')[0].files[0];
-	data = new FormData();
-	data.append('image',image)
-	data.append('csrfmiddlewaretoken',postToken)
-	data.append('post_text',text)
-	data.append('post_image', image)
+	data = {'csrfmiddlewaretoken':postToken, 'post_text':text}
 	$.ajax({
 		url: '/ajax/post/',
 		data: data,
 		dataType: 'json',
-		type: 'POST',
-		contentType: false,
-		processData: false,
+		method: 'POST',
 		success: function(data) {
 			$('#post-field').val('');
 			$('#id_post_image').val('');
