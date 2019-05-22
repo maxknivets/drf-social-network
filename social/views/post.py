@@ -35,7 +35,9 @@ def post(request):
 class WritePost(generics.CreateAPIView):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
-        
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
     
 def databasecheck(request, post_id):
     if request.user.is_authenticated:

@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'root.urls'
+ROOT_URLCONF = 'socialproject.urls'
 
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
@@ -74,7 +74,7 @@ TEMPLATES = [
     },
 ]
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-WSGI_APPLICATION = 'root.wsgi.application'
+WSGI_APPLICATION = 'socialproject.wsgi.application'
 
 
 # Database
