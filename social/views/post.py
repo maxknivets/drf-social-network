@@ -8,29 +8,6 @@ from social.serializers import PostSerializer#, VoteSerializer
 from rest_framework import generics
 from rest_framework.response import Response
 
-def post(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            text = form.cleaned_data.get('post_text')
-            image = request.FILES.get('post_image')
-            date = timezone.now()            
-            post = Post(post_text=text, user=request.user, pub_date=date)
-            if image:
-                post = Post(post_text=text, user=request.user, pub_date=date, image=image)
-            post.save()
-
-            data = {}
-            data['post_image'] = None
-            if image:
-                data['post_image'] = post.image.url
-            data['post_text'] = escape(post.post_text)
-            data['post_date'] = post.get_readable_date()
-            data['post_id'] = post.pk
-            data['user_id'] = request.user.pk
-            data['username'] = request.user.username
-            return JsonResponse(data)    
-    return redirect('/')
 
 class WritePost(generics.CreateAPIView):
     serializer_class = PostSerializer
@@ -38,6 +15,7 @@ class WritePost(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
     
 def databasecheck(request, post_id):
     if request.user.is_authenticated:
