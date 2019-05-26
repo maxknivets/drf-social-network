@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.html import escape
 from social.models import User, Post, Vote
 from social.forms import PostForm, EditForm, DeleteForm
-from social.serializers import PostSerializer#, VoteSerializer
+from social.serializers import PostSerializer
 from rest_framework import generics
 from rest_framework.response import Response
 
@@ -15,18 +15,6 @@ class WritePost(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    
-def databasecheck(request, post_id):
-    if request.user.is_authenticated:
-        data={'currentId':Post.objects.last().pk, 'lastId':post_id}
-        return JsonResponse(data)
-    return redirect('/')
-
-            
-class GetPostInfo(generics.RetrieveAPIView):
-    serializer_class = PostSerializer
-    queryset = Post.objects.all()
     
 
 class VoteOnPost(generics.GenericAPIView):
@@ -55,30 +43,13 @@ class VoteOnPost(generics.GenericAPIView):
         return Response(data)
 
 
-def edit(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        form = EditForm(request.POST)
-        if form.is_valid():
-            post_id = form.cleaned_data.get('id')
-            post = get_object_or_404(Post, pk=post_id)
-            if request.user == post.user:
-                new_text = form.cleaned_data.get('new_text')
-                post.post_text = new_text
-                post.save()
-                data = { 'new_text': escape(new_text) }
-                return JsonResponse(data)
-    return redirect('/')
-
-
-
-def delete(request):
-    if request.user.is_authenticated:
-        post_id = request.GET.get('id')
-        post = get_object_or_404(Post, pk=post_id)
-        if request.user == post.user:
-            post.delete()
-            data = { 'post_id': post_id }
-            return JsonResponse(data)
-    return redirect('/')
-
+class Edit(generics.UpdateAPIView):
+    queryset = Post.objects.all()
+ 
+    def put(self, request, *args, **kwargs):
+        serializer.save(user=self.request.user)
+        
+class Delete(generics.DestroyAPIView):
+    queryset = Post.objects.all()
+    lookup_field = 'pk'
 

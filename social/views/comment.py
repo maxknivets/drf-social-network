@@ -4,7 +4,8 @@ from django.utils import timezone
 from django.utils.html import escape
 from social.models import User, Vote, Comment, Post
 from social.forms import EditForm, DeleteForm, CommentForm
-
+from rest_framework import generics
+from rest_framework.response import Response
 
 def comment(request):
     if request.user.is_authenticated and request.method == 'POST':
@@ -42,6 +43,7 @@ def comment(request):
             return JsonResponse(data)
     return redirect('/')
 
+#class CommentOnPost(generics.CreateAPIView):
 
 def commentedit(request):
     if request.user.is_authenticated and request.method == 'POST':
@@ -68,36 +70,5 @@ def commentdelete(request):
             data = { 'comment_id': comment_id }
             return JsonResponse(data)
     return redirect('/')
-
-
-def getcommentinfo(request, comment_id):
-    if request.user.is_authenticated:
-        comment = get_object_or_404(Comment, pk=comment_id)
-        data = {}
-        if comment.in_reply_to_user and comment.in_reply_to_comment:
-            data['in_reply_to_user']=comment.in_reply_to_user
-            data['in_reply_to_comment']=comment.in_reply_to_comment
-            data['get_username']=comment.get_user().username
-        else:
-            data['in_reply_to_user']=None
-            data['in_reply_to_comment']=None
-        data['request_user_id']=request.user.pk
-        data['post_id']=comment.post.pk
-        data['comment_text']=escape(comment.comment)
-        data['comment_pk']=comment.pk
-        data['posted_by']=comment.posted_by.username
-        data['user_id']=comment.posted_by.pk
-        data['date']=comment.get_readable_date()
-        return JsonResponse(data)
-    return redirect('/')
-
-
-
-def commentdatabasecheck(request, comment_id):
-    if request.user.is_authenticated:
-        data={'currentId':Comment.objects.last().pk, 'lastId':comment_id}
-        return JsonResponse(data)
-    return redirect('/')
-
 
 
