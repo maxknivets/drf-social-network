@@ -51,5 +51,7 @@ class Edit(generics.UpdateAPIView):
         
 class Delete(generics.DestroyAPIView):
     queryset = Post.objects.all()
-    lookup_field = 'pk'
-
+    
+    
+    
+    

@@ -157,7 +157,6 @@ function editPost(post_id) {
 		url: '/ajax/edit/'+post_id+'/',
 		data: { csrfmiddlewaretoken: postEditToken, id: post_id, new_text: text },
 		dataType: 'json',
-		method:'PUT',
 		success: function (data) {
 			$(`#post_text${post_id}`).text(data.new_text);
 			toggleVisibility(`edit${post_id}`)
@@ -177,7 +176,7 @@ function editPost(post_id) {
 function deletePost(post_id) {
     event.preventDefault()
 	$.ajax({
-		url: `/ajax/delete/${post_id}/`,
+		url: '/ajax/delete/'+post_id+'/',
 		method: 'DELETE',
 		success: function () {
 			$(`#post${post_id}`).remove();
