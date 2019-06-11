@@ -15,6 +15,9 @@ class Post(models.Model):
     def get_readable_date(self):
         return self.pub_date.strftime("%l:%M%p on %B %d, %Y")
     
+    def get_username(self):
+        return self.user.username
+    
     def __str__(self):
         return self.post_text
 
@@ -66,7 +69,7 @@ class Vote(models.Model):
 
 class Comment(models.Model):
     comment = models.CharField(max_length=1000)
-    post_date = models.DateTimeField('Publication Date')
+    post_date = models.DateTimeField('Publication Date', auto_now=True)
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     in_reply_to_comment = models.IntegerField(blank=True, null=True)

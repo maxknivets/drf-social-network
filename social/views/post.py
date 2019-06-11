@@ -4,18 +4,20 @@ from django.utils import timezone
 from django.utils.html import escape
 from social.models import User, Post, Vote
 from social.forms import PostForm, EditForm, DeleteForm
-from social.serializers import PostSerializer
-from rest_framework import generics
+from social.serializers import PostSerializer, PostListSerializer, PostEditSerializer
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
-
-
-class WritePost(generics.CreateAPIView):
-    serializer_class = PostSerializer
+    
+class RetrievePosts(generics.ListAPIView):
     queryset = Post.objects.all()
+    serializer_class = PostListSerializer
+    
+class WritePost(generics.CreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-    
+        serializer.save(user=self.request.user)    
 
 class VoteOnPost(generics.GenericAPIView):
     queryset = Vote.objects.all()
@@ -45,13 +47,12 @@ class VoteOnPost(generics.GenericAPIView):
 
 class Edit(generics.UpdateAPIView):
     queryset = Post.objects.all()
- 
-    def put(self, request, *args, **kwargs):
-        serializer.save(user=self.request.user)
-        
-class Delete(generics.DestroyAPIView):
-    queryset = Post.objects.all()
+    serializer_class = PostEditSerializer
     
-    
-    
-    
+def delete(request, post_id):
+    if request.user.is_authenticated:
+        post = get_object_or_404(Post, pk=post_id)
+        if request.user == post.user:
+            post.delete()
+    return redirect('/')
+

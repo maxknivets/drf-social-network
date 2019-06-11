@@ -4,46 +4,27 @@ from django.utils import timezone
 from django.utils.html import escape
 from social.models import User, Vote, Comment, Post
 from social.forms import EditForm, DeleteForm, CommentForm
+from social.serializers import CommentSerializer, CommentListSerializer	
 from rest_framework import generics
 from rest_framework.response import Response
 
-def comment(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            post_id = form.cleaned_data.get('id')
-            post = get_object_or_404(Post, pk=post_id)
-            
-            comment = form.cleaned_data.get('comment')
-            in_reply_to_user = form.cleaned_data.get('in_reply_to_user')
-            in_reply_to_comment = form.cleaned_data.get('in_reply_to_comment')
-            date = timezone.now()
-            data = {}
-            new_comment = Comment(comment=comment, post_date=date, posted_by=request.user, post=post)
-            
-            if in_reply_to_user and in_reply_to_comment:
-                new_comment.in_reply_to_user=in_reply_to_user
-                new_comment.in_reply_to_comment=in_reply_to_comment
-                data['in_reply_to_user']=in_reply_to_user
-                data['in_reply_to_comment']=in_reply_to_comment
-                data['get_username']=new_comment.get_user().username
-            else:
-                data['in_reply_to_user']=None
-                data['in_reply_to_comment']=None
-            
-            new_comment.save()
-            
-            data['post_id']=post_id
-            data['comment_text']=escape(new_comment.comment)
-            data['comment_pk']=new_comment.pk
-            data['posted_by']=new_comment.posted_by.username
-            data['user_id']=new_comment.posted_by.pk
-            data['date']=new_comment.get_readable_date()
-            
-            return JsonResponse(data)
-    return redirect('/')
+class WriteComment(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(post=Post.objects.filter(pk=self.request.data.get('post')).first())
+        serializer.save(posted_by=self.request.user)
 
-#class CommentOnPost(generics.CreateAPIView):
+class RetrieveComments(generics.ListAPIView):
+    serializers_class = CommentListSerializer
+    lookup_field='pk'
+    
+    def get_queryset(self):
+        import pdb; pdb.set_trace()
+        post = Post.objects.filter(pk=self.kwargs.get(self.lookup_field))
+        comments = Comment.objects.filter(post=post)
+        return comments
 
 def commentedit(request):
     if request.user.is_authenticated and request.method == 'POST':

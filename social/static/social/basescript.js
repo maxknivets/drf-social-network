@@ -174,15 +174,13 @@ function editPost(post_id) {
 
 
 function deletePost(post_id) {
-    event.preventDefault()
+	event.preventDefault() 
 	$.ajax({
 		url: '/ajax/delete/'+post_id+'/',
-		method: 'DELETE',
 		success: function () {
 			$(`#post${post_id}`).remove();
 			console.log('success');
 		},
-
 		error:function (xhr, ajaxOptions, thrownError){
 			if(xhr.status==404) {
 				alert("Something went wrong. Probably the post has been deleted.");

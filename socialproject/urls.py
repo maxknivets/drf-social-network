@@ -18,10 +18,7 @@ from django.urls import include, path
 from rest_framework import routers
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from social import views
 from . import settings
-
-router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include('social.urls')),
