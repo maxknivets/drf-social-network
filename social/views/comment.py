@@ -17,12 +17,11 @@ class WriteComment(generics.CreateAPIView):
         serializer.save(posted_by=self.request.user)
 
 class RetrieveComments(generics.ListAPIView):
-    serializers_class = CommentListSerializer
+    serializer_class = CommentListSerializer
     lookup_field='pk'
     
     def get_queryset(self):
-        import pdb; pdb.set_trace()
-        post = Post.objects.filter(pk=self.kwargs.get(self.lookup_field))
+        post = Post.objects.get(pk=self.kwargs.get(self.lookup_field))
         comments = Comment.objects.filter(post=post)
         return comments
 
@@ -36,11 +35,9 @@ def commentedit(request):
                 new_text = form.cleaned_data.get('new_text')
                 comment.comment = new_text
                 comment.save()
-                data = { 'new_text': escape(new_text) }
+                data = {'new_text': escape(new_text)}
                 return JsonResponse(data)
     return redirect('/')
-
-
 
 def commentdelete(request):
     if request.user.is_authenticated:

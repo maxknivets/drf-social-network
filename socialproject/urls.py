@@ -15,9 +15,10 @@ Including another URLconf
 """
 
 from django.urls import include, path
-from rest_framework import routers
+from django.conf.urls import include
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from rest_framework import routers
 from . import settings
 
 urlpatterns = [
@@ -26,5 +27,5 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
+urlpatterns += [path('api-auth/', include('rest_framework.urls')),]
 

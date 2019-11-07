@@ -44,7 +44,7 @@ class Followers(models.Model):
         return Followers.objects.filter(is_followed_by=user)
         
     def followers(self, user):
-        followers_list = Followers.objects.filter(user=user).exclude(is_followed_by=user)
+        followers_list = Followers.objects.filter(user=user).exclude(is_followed_by=user) # what the hell is this
         
     def __str__(self):
         return str(self.user)

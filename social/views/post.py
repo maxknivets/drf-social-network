@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.html import escape
 from social.models import User, Post, Vote
-from social.forms import PostForm, EditForm, DeleteForm
 from social.serializers import PostSerializer, PostListSerializer, PostEditSerializer
 from rest_framework import generics, viewsets
 from rest_framework.response import Response

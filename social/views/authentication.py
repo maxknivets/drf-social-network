@@ -1,16 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from social.forms import SignUpForm
 from social.models import User
-
-
+from rest_framework.authtoken.models import Token
 
 def signup(request):
     if request.user.is_authenticated:
         return redirect('/')
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -19,7 +18,7 @@ def signup(request):
             login(request, user)
             return redirect('/')
     else:
-        form = SignUpForm()
+        form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
 def logout(request):

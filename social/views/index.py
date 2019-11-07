@@ -7,11 +7,9 @@ from social.forms import PostForm, EditForm, DeleteForm, CommentForm
 
 
 def index(request):
-    if request.user.is_authenticated:
-        posts = Post.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[::1]
-        last_post = Post.objects.get_queryset().last()
-        return render(request, 'social/index.html', {'latest_posts_list':posts, 'latest_post':last_post, 'postform':PostForm(), 'editform':EditForm(), 'commentform':CommentForm()})
-    return redirect('/login')
+    posts = Post.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[::1]
+    last_post = Post.objects.get_queryset().last()
+    return render(request, 'social/index.html', {'latest_posts_list':posts, 'latest_post':last_post, 'postform':PostForm(), 'editform':EditForm(), 'commentform':CommentForm()})
 
 
 #class Index(LoginRequiredMixin, generic.ListView):

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core import serializers
 from django.http import JsonResponse
 from social.models import User, Post, Comment, Followers, Profile, ProfilePicture
 from social.forms import EditForm, DeleteForm, CommentForm, ChangeForm, PFPForm
@@ -57,6 +58,10 @@ def user(request, user_id):
     return redirect('/')
 
 
+def getuser(request):
+    if request.user.is_authenticated:
+        return JsonResponse({'username':request.user.username, 'user_id':request.user.id})
+    return redirect('/')
 
 def showcomment(request, comment_id):
     if request.user.is_authenticated:

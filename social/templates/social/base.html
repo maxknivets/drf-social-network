@@ -10,25 +10,22 @@
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
-    <title>React to-do list</title>
+    <title>React frontpage</title>
   </head>
   <body>
     <div id="root"></div>
-    <script>function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}</script>
+    <script>
+function getCookie() {
+  const REGEXP = /([\w\.]+)\s*=\s*(?:"((?:\\"|[^"])*)"|(.*?))\s*(?:[;,]|$)/g;
+  let cookies = {};
+  let match;
+  while( (match = REGEXP.exec(document.cookie)) !== null ) {
+    let value = match[2] || match[3];
+    cookies[match[1]] = decodeURIComponent(value);
+  }
+  return cookies;
+}
+</script>
     <script type="text/babel">
     
 
@@ -48,11 +45,12 @@ class WritePostForm extends React.Component {
   handleSubmit = event =>{
     event.preventDefault();
     const url ="/ajax/post/"
+    const authtoken = "Token " + localStorage.Authorization 
     const csrftoken = getCookie('csrftoken')
-    const data = { 'post_text':this.state.value }
+    const data = { 'post_text': this.state.value }
     fetch(url, { method: 'POST',
     body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken  }
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, Authorization: authtoken}
     })
     .then(response => {
       if (response.status !== 201) {
@@ -78,8 +76,6 @@ class WritePostForm extends React.Component {
 }    
 
 
-
-
 class WriteCommentForm extends React.Component {
   constructor(props){
     super(props);
@@ -96,6 +92,7 @@ class WriteCommentForm extends React.Component {
   handleSubmit = event =>{
     event.preventDefault();
     const url ="/ajax/comment/"
+    const authtoken = "Token " + localStorage.Authorization 
     const csrftoken = getCookie('csrftoken')
     const data = { 'comment':this.state.value, 'post':this.props.id }
     if (this.props.in_reply_to_comment && this.props.in_reply_to_user){
@@ -103,7 +100,7 @@ class WriteCommentForm extends React.Component {
     }
     fetch(url, { method: 'POST',
     body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken  }
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, Authorization: authtoken }
     })
     .then(response => {
       if (response.status !== 201) {
@@ -129,61 +126,110 @@ class WriteCommentForm extends React.Component {
 }
 
 
-function GetComments(props) {
-  fetch('/ajax/retrievecomments/'+this.props.id+'/')
+class Comments extends React.Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      comments: [],
+    };
+    this.getComments = this.getComments.bind(this)
+    this.getComments(this.props.post_id)
+  }
+
+  getComments(id) {
+  fetch('/ajax/retrievecomments/'+id+'/',
+    { headers: { 'Content-Type': 'application/json', Authorization: "Token " + localStorage.Authorization }
+    })
     .then(response => {
       if (response.status !== 200) {
-        return "Something went terribly wrong.";
+        console.log("Something went terribly wrong.")
       }
-      return response.json();
-    })
-    .then(data => { return data });
+      return response.json()
+      })
+    .then(data => this.setState({comments: data}))
+  }
+  
+  render() {
+    return (
+      <div>
+      {this.state.comments.map(comment =>
+        <div key={comment.id} className="jumbotron">Comment: {comment.comment}
+        <br />Posted by {comment.posted_by}
+        <br />Posted on {comment.post_date}
+        <WriteCommentForm id={this.props.post_id} in_reply_to_comment={comment.in_reply_to_comment} in_reply_to_user={this.props.in_reply_to_user} />
+        </div>
+      )}
+    </div>
+    )
+  }
 }
 
-
-
-class App extends React.Component {
+class Posts extends React.Component {
   constructor(){
     super()
     this.state = {
       posts: [],
-      comments: []	,
-      placeholder: 'No posts here!',
+      userinfo: {user_id: undefined, username: undefined}
     };
     this.getPosts = this.getPosts.bind(this)
+    this.getUser = this.getUser.bind(this)
+    this.getPosts();
+    this.getUser()
   }
-  
+
   getPosts() {
-    fetch('/ajax/retrieveposts/')
+  fetch('/ajax/retrieveposts/', {
+    headers: { 'Content-Type': 'application/json', Authorization: "Token " + localStorage.Authorization }
+    })
       .then(response => {
         if (response.status !== 200) {
-          return this.setState({ placeholder: "Something went terribly wrong." });
+          console.log("Something went terribly wrong.")
         }
-        return response.json();
+        return response.json()
       })
-      .then(data => this.setState({ posts: data }));
+      .then(data => this.setState({posts: data}))
   }
-  
-  componentDidMount(){
-    this.getPosts();
+
+  getUser() {
+    fetch('/ajax/getuser/', {
+    headers: { 'Content-Type': 'application/json', Authorization: "Token " + localStorage.Authorization }
+    })
+    .then(response => {
+      if (response.status !== 200) {
+        console.log("Something went terribly wrong.")
+      }
+      return response.json()
+      })
+      .then(data => this.setState({username: data.username,user_id: data.user_id}))
   }
-  
+
   render(){
     return (
     <div>
       <WritePostForm />
-      <button onClick={this.getPosts}>View posts</button>
       {this.state.posts.map(post => 
         <div key={post.id} className="jumbotron">Post text: {post.post_text}
-        <br /><img src={post.image} />
-        <br />Posted by {post.user}
-        <br />Posted on {post.pub_date}
-        <WriteCommentForm id={post.id}/>
-        <GetComments id={post.id} />
-        <br /><br /><br /><br />
+          <br /><img src={post.image} />
+          <br />Posted by {post.user}
+          <br />Posted on {post.pub_date}
+          <br />
+          <WriteCommentForm id={post.id}/>
+          <Comments post_id={post.id}/>
         </div>
-      )}
-    </div>)
+        )}
+      <br /><br /><br /><br />
+    </div>
+    ) 
+  }
+}
+
+class App extends React.Component {
+  render(){
+    return (
+    <div>
+      <Posts />
+    </div>
+    ) 
   }
 }
 
