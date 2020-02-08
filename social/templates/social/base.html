@@ -45,7 +45,7 @@ class WritePostForm extends React.Component {
   handleSubmit = event =>{
     event.preventDefault();
     const url ="/ajax/post/"
-    const authtoken = "Token " + localStorage.Authorization 
+    const authtoken = localStorage.Authorization 
     const csrftoken = getCookie('csrftoken')
     const data = { 'post_text': this.state.value }
     fetch(url, { method: 'POST',
@@ -75,6 +75,62 @@ class WritePostForm extends React.Component {
   }
 }    
 
+class EditPostForm extends React.Component {
+  constructor(){
+    super()
+    this.state = {
+      value: '',
+    }
+    this.handleChange = this.handleChange.bind(this);
+  }
+  
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit = event => {
+    event.preventDefault();
+    const url = "/ajax/edit/" + this.props.post_id + "/"
+    const authtoken = localStorage.Authorization 
+    const csrftoken = getCookie('csrftoken')
+    const data = { 'post_text': this.state.value }
+    fetch(url, { method: 'PUT',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, Authorization: authtoken}
+    })
+    .then(response => {
+      if (response.status !== 201) {
+        console.log('something went terribly wrong'); 
+      }
+      else {
+        console.log('success');
+      }
+    })
+  }
+  
+  render() {
+    var post_belongs_to_logged_user = this.props.post_user_id === this.props.logged_user_id 
+    return (
+      <div>
+      {post_belongs_to_logged_user ?
+      (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Edit your post:
+          <input type="text" value={this.state.value} onChange={this.handleChange} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+      )
+      :
+      (<div>Nice</div>)
+      }
+      </div>
+   );
+  }
+}    
+
+
 
 class WriteCommentForm extends React.Component {
   constructor(props){
@@ -92,7 +148,7 @@ class WriteCommentForm extends React.Component {
   handleSubmit = event =>{
     event.preventDefault();
     const url ="/ajax/comment/"
-    const authtoken = "Token " + localStorage.Authorization 
+    const authtoken = localStorage.Authorization 
     const csrftoken = getCookie('csrftoken')
     const data = { 'comment':this.state.value, 'post':this.props.id }
     if (this.props.in_reply_to_comment && this.props.in_reply_to_user){
@@ -138,7 +194,7 @@ class Comments extends React.Component {
 
   getComments(id) {
   fetch('/ajax/retrievecomments/'+id+'/',
-    { headers: { 'Content-Type': 'application/json', Authorization: "Token " + localStorage.Authorization }
+    { headers: { 'Content-Type': 'application/json', Authorization: localStorage.Authorization }
     })
     .then(response => {
       if (response.status !== 200) {
@@ -153,13 +209,15 @@ class Comments extends React.Component {
     return (
       <div>
       {this.state.comments.map(comment =>
-        <div key={comment.id} className="jumbotron">Comment: {comment.comment}
-        <br />Posted by {comment.posted_by}
+        <div key={comment.id} className="jumbotron">
+        <h1>{comment.comment}</h1>
+        <br />Posted by {comment.posted_by} 
         <br />Posted on {comment.post_date}
         <WriteCommentForm id={this.props.post_id} in_reply_to_comment={comment.in_reply_to_comment} in_reply_to_user={this.props.in_reply_to_user} />
         </div>
       )}
-    </div>
+      </div>
+    
     )
   }
 }
@@ -179,7 +237,7 @@ class Posts extends React.Component {
 
   getPosts() {
   fetch('/ajax/retrieveposts/', {
-    headers: { 'Content-Type': 'application/json', Authorization: "Token " + localStorage.Authorization }
+    headers: { 'Content-Type': 'application/json', Authorization: localStorage.Authorization }
     })
       .then(response => {
         if (response.status !== 200) {
@@ -192,7 +250,7 @@ class Posts extends React.Component {
 
   getUser() {
     fetch('/ajax/getuser/', {
-    headers: { 'Content-Type': 'application/json', Authorization: "Token " + localStorage.Authorization }
+    headers: { 'Content-Type': 'application/json', Authorization: localStorage.Authorization }
     })
     .then(response => {
       if (response.status !== 200) {
@@ -200,19 +258,22 @@ class Posts extends React.Component {
       }
       return response.json()
       })
-      .then(data => this.setState({username: data.username,user_id: data.user_id}))
+      .then(data => this.setState({username: data.username, user_id: data.user_id}))
   }
 
   render(){
     return (
     <div>
       <WritePostForm />
-      {this.state.posts.map(post => 
-        <div key={post.id} className="jumbotron">Post text: {post.post_text}
+      {this.state.posts.map(post =>
+        <div key={post.id} className="jumbotron">
+          <h1>{post.post_text}</h1>
           <br /><img src={post.image} />
           <br />Posted by {post.user}
           <br />Posted on {post.pub_date}
           <br />
+          <EditPostForm post_username={post.user} logged_username={this.state.userinfo.username} post_id={post.id} />
+          
           <WriteCommentForm id={post.id}/>
           <Comments post_id={post.id}/>
         </div>
