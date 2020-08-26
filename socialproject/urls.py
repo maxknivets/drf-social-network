@@ -22,7 +22,8 @@ from rest_framework import routers
 from . import settings
 
 urlpatterns = [
-    path('', include('social.urls')),
+    path('', include('backend.urls')),
+    path('', include('frontend.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

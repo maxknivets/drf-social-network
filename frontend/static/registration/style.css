@@ -1,0 +1,10 @@
+span {
+	text-align: center;
+	font-size: 2em;
+	display: block;
+}
+
+ul {
+    width: 70%;
+    margin: auto;
+}

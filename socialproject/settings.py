@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social.apps.SocialConfig',
+    'backend.apps.BackendConfig',
+    'frontend',
     'rest_framework',
     'rest_framework.authtoken',
 ]

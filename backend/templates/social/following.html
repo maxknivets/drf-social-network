@@ -1,0 +1,14 @@
+<head>
+ <title>{{ theuser.username }}'s follows</title>
+</head>
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'social/style.css' %}" />
+{% if following_list %}
+    <ol>
+    {% for following in following_list %}
+        <li><a href="/user/{{ following.user.pk }}">{{ following.user }}</a></li>
+    {% endfor %}
+    </ol>
+{% else %}
+    Looks like the user doesn't follow anyone!
+{% endif %}

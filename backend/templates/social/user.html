@@ -1,0 +1,59 @@
+{% extends 'social/base.html' %}
+<head>
+  {% load static %}
+  {% block stylesheet %}{% endblock %}
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+    var profileChangeToken = '{{ csrf_token }}'
+  </script>
+<script src="{% static 'social/basescript.js' %}"></script>
+
+{% block title %} {{ theuser.username }}'s profile {% endblock %}
+
+
+{% block content %}
+  <div style="display:none;" id="page">user</div>
+
+  <span class="smallercenterfont">
+  {% if pfp %}
+    <img src="/media/{{ pfp.profile_picture }}" alt="{{ theuser.username }}'s profile picture">
+  {% else %}
+    <img alt="user" src="{% static 'icons/user.svg' %}" width="100" height="100">
+  {% endif %}
+
+  <br><strong>{{ theuser.username }}</strong>
+  <br><br>Name and last name: <span id="first_name">{% if theuser.first_name %} {{ theuser.first_name }} {% endif %}</span> <span id="last_name">{% if theuser.last_name %} {{ theuser.last_name }}{% endif %}</span>
+  <br>Joined at {{ theuser.date_joined }}
+  <br>Bio: <span id="bio">{% if profile.bio %} {{ profile.bio }} {% else %} The user has no bio. {% endif %}</span>
+  <br>Location: <span id="location">{% if profile.location %} {{ profile.location }} {% else %} The user didn't mention his location.{% endif %}</span>
+  <br>Total follows: {% total_followed theuser %} <a href="/following/{{ theuser.pk }}">{{ theuser.username }}'s follows</a>
+  <br>Total followers: <span id="followers">{% total_followers theuser %}</span> <a href="/followers/{{ theuser.pk }}">{{ theuser.username }}'s followers </a>
+
+
+  {% if theuser != user %}
+    <br><button class="coolButton" onclick="followUser({{ theuser.pk }})"><span id="follow">{% already_followed theuser user %}</span></button>
+  {% else %}
+    <br><strong>Cannot follow yourself!</strong>
+  {% if profilepicture %}
+    <br><button class="coolButton" onclick="toggleVisibility('change_profile_picture')">Change profile picture</button>
+  {% else %}
+    <br><button class="coolButton" onclick="toggleVisibility('change_profile_picture')">Set profile picture</button>
+  {% endif %}
+  <br><span id="change_profile_picture" class="changenone">
+    <form action="/changepfp/" method="post" enctype="multipart/form-data">{% csrf_token %}
+      {{ pfpform.as_p }}
+      <input type="submit" value="Change" />
+    </form>
+  </span>
+
+  <br><button class="coolButton" onclick="toggleVisibility('settings')">Profile settings</button>
+  <span id="settings" class="changenone">
+    <form onsubmit="bioChange()">
+      {{ changeform.as_p }}
+      <input type="submit" value="change" onclick="toggleVisibility('settings')">
+    </form>
+    <small>You may also leave the fields blank.</small>
+  </span>
+{% endif %}
+</span>
+{% endblock %}

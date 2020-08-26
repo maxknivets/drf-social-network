@@ -1,0 +1,14 @@
+<head>
+ <title>{{ theuser.username }}'s followers</title>
+</head>
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'social/style.css' %}" />
+{% if followers_list %}
+    <ol>
+    {% for followers in followers_list %}
+        <li><a href="/user/{{ followers.is_followed_by.pk }}">{{ followers.is_followed_by }}</a></li>
+    {% endfor %}
+    </ol>
+{% else %}
+    {% if user != theuser %} Looks like the user doesn't have any followers :( <br>Be the first to <a href="/follow/{{ theuser.pk }}">follow</a>! {% else %} Looks like you don't have any followers :( <br><a href="/">Write</a> some posts to draw other's attention! {% endif %}
+{% endif %}

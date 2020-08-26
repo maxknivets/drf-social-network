@@ -1,0 +1,27 @@
+<head>
+  <title>Home</title>
+  {% extends 'social/base.html' %}
+  {% load staticfiles %}
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="{% static 'social/basecript.js' %}"></script>
+
+</head>
+{% block content %}
+  <span class="center">Hi <a href="/user/{{ user.pk }}">{{ user.username }}!</a><a href="/logout"><img class="main" alt="log out" src="{% static 'icons/sign-out-alt.svg' %}" ></a></span>
+
+  <div class="main">Write a post!</div>
+
+
+  <form id="post_form" method="post" onsubmit="createPost()">
+  <div class="flex">{{ postform.post_text }}
+  <img onclick="toggleVisibility('drop_down_button');" alt="down" src="{% static 'icons/arrow-down.svg' %}" height="36px" width="36px"></div>
+  <span class="none" id="drop_down_button">
+    {{ postform.post_image }}
+    <br><small>attach image here</small>
+  </span>
+  <br><input type="submit" value="post">
+</form>
+
+{% endblock %}
+

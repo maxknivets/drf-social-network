@@ -1,0 +1,175 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <title>Development</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% load static %}
+
+    <script src="https://unidg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unidg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unidg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'social/basescript.js' %}"></script>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoidFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'social/style.css' %}">
+    <title>Home</title>
+  </head>
+
+  <body>
+    <div id="home"></div>
+    <script type="text/babel">
+
+const sessionUser = genericAJAXRequest('/ajax/get-user/', "GET", undefined)
+
+function PostOptionsJSX (post) {  
+  return (
+    <div>
+      <button className="btn btn-outline-success btn-sm" onClick={rate(post.id)}>
+        <img className="icon" src="{% static 'icons/thumbs-up.svg' %}" />
+        <span id="total_likes"></span>
+      </button>
+
+      <button className="btn btn-outline-secondary btn-sm" onClick={rate(post.id)}>
+        <img className="icon" src="{% static 'icons/thumbs-down.svg' %}" />
+        <span id="total_dislikes">test</span>
+      </button>
+
+      <button className="btn btn-outline-primary btn-sm" disabled>
+        <img className="icon" alt="comments" src="{% static 'icons/comment.svg' %}" />
+      </button>
+
+      {post.user == sessionUser && 
+        <span>
+          <button className="btn btn-outline-primary btn-sm" onClick={$(`edit-post-${post.id}`).toggle()}>
+            <img className="icon" src="{% static 'icons/pencil-alt.svg' %}" />
+          </button>
+          <button className="btn btn-outline-danger btn-sm" onClick={$(`delete-post-${post.id}`).toggle()}>
+            <img className="icon" alt="delete" src="{% static 'icons/trash-alt.svg' %}" />
+          </button>
+        </span>
+      }
+      
+      <button className="btn btn-outline-primary btn-sm" onClick={$(`comment-on-post-${post.id}`).toggle()}>
+        <img className="icon" alt="reply" src="{% static 'icons/arrow-down.svg' %}" />
+      </button>
+
+      <div className="hidden my-2 text-left" id={`edit-post-${post.id}`}>
+        <TextForm url={"/ajax/post"} method={"PUT"} dataName={"post_text"} label={<p>Edit post</p>} />
+      </div>
+
+      <div className="hidden my-2 text-left" id={`delete-post-${post.id}`}>
+        <button className="btn btn-danger" onClick="deletePost({{ post.id }})">Delete Post</button>
+      </div>
+
+      <span className="hidden" id={`comment-on-post-${post.id}`}>
+        <form onSubmit={commentOnPost(post.id)}>
+          <button className="btn btn-primary btn-block" type="submit">Comment</button>
+        </form>
+      </span>
+
+    </div>
+  );
+}
+
+class Posts extends React.Component {
+  constructor(){
+    super()
+    this.state = {
+      posts: [],
+    };
+    this.getPosts = this.getPosts.bind(this)
+    this.getPosts();
+  }
+
+  getPosts() {
+    fetch('api/retrieve-posts', {
+      headers: {
+        'Content-Type': 'application/json',
+  		  'Authorization': Cookies.get('sessionid'),
+      }
+    })
+    .then(response => {
+      return response.json()
+    })
+    .then(data => this.setState({posts: data}))
+  }
+
+  render() {
+    return (
+      <ul>
+        {this.state.posts.map(post =>
+          <li key={post.id} className="post" id={post.id}>
+            <p className="post-text" id="post-text">{post.post_text}</p>
+            <a href={`/user/${post.user.id}`}>{post.user.username}</a> 
+            {post.image &&
+              <img className="img-fluid" src={`${post.image.url}`} alt="post-image" />
+            }
+
+            <span class="text-left">
+              <span class="post-date"> { post.pub_date } </span>
+              <PostOptionsJSX post={post} />
+            </span>
+          </li>
+        )}
+      </ul>
+    )
+  }
+}
+
+
+class TextForm extends React.Component {
+  constructor(){
+    super()
+    this.state = {
+      value: '',
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+  
+  handleChange(event) {
+    this.setState({ value: event.target.value });
+  }
+
+  handleSubmit = event => {
+    event.preventDefault();
+    if (this.props.post) {
+      genericAJAXRequest(this.props.url, this.props.method, { "post_text" : this.state.value });
+    } else {
+      genericAJAXRequest(this.props.url, this.props.method, { "comment" : this.state.value });
+    }
+    //(this.props.submit ? submit() : edit())
+  }
+  
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          {this.props.label}
+          <input type="text" value={this.state.value} onChange={this.handleChange} required />
+        </label>
+        <input type="submit" value={this.props.value} />
+      </form>
+    );
+  }
+}
+
+class Home extends React.Component {
+  render() {
+    return (
+      <div>
+        <TextForm url={"/ajax/post/"} method={"POST"} post={true} label={<p>Publish post</p>} />
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<Home />, document.getElementById('home'))
+
+    </script>
+  </body>
+</html>
