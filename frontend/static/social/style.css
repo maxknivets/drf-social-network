@@ -49,7 +49,6 @@ body {
 
 .homecenter {
     margin: 0 auto;
-    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,11 +140,23 @@ img.pfp {
     display: block;
 }
 
-.posts {
-    margin: 0 auto;
+.index-posts {
+    position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 16.35%;
+}
+
+.comment-separator {
+    border-top: 1.5px solid #44494a;
+}
+
+.post {
+    width: 64.35%;
+    padding: 10px 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .post-text {

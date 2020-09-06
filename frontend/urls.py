@@ -2,13 +2,15 @@ from django.urls import path
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-from .views import index, comments_page
+from .views import home, comments_page, profile_page, settings_page
 from rest_framework.authtoken import views as rest_auth_views
 
 app_name = 'frontend'
 
 urlpatterns = [
-    path('', index, name='index'),
-    path('post/<int:id>/comments/', comments_page, name='comments')
+    path('', home, name='home'),
+    path('settings/', settings_page, name='settings'),
+    path('profile/<int:id>/', profile_page, name='profile'),
+    path('post/<int:id>/comments/', comments_page, name='comments'),
 ]
 
