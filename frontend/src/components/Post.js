@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import Cookies from 'js-cookie';
-import { Component, useState, useEffect } from 'react';
+import classnames from 'classnames'
 
 import { TextForm, MiscellaneousCountButton, ToggleFormButton, DeleteButton, LikeButton } from './Misc';
+import styles from './App.css';
 
 export class Posts extends Component {
   constructor(props) {
@@ -68,7 +69,7 @@ export function QuerySinglePost(props) {
   }, [])
 
   return (
-    <div className="index-posts">
+    <div className={styles.indexPosts}>
       <Post props={undefined} post={post} />
     </div>
   )
@@ -76,16 +77,16 @@ export function QuerySinglePost(props) {
 
 export function Post(props) {
   return (
-    <div className='post' id={`post-${props.post.id}`}>
-      <p className='post-text' id='post-text'>{props.post.text}</p>
+    <div className={classnames(styles.post, styles.separator)} id={`post-${props.post.id}`}>
+      <p className={styles.postText} id='post-text'>{props.post.text}</p>
 
       {props.post.image && // this is for later
         <img className='img-fluid' src={`${props.post.image.url}`} alt='post-image' />
       }
 
-      <span className='post-header text-left'>
+      <span className='text-left' id="post-header">
         <a href={`/profile/${props.post.posted_by.id}/`}>{props.post.posted_by.username}</a>
-        <span className='post-date'> {props.post.pub_date} </span>
+        <span className={styles.postDate} id="post-date"> {props.post.pub_date} </span>
       </span>
 
       <PostOptionsJSX post={props.post} />
@@ -98,38 +99,38 @@ export function PostOptionsJSX(props) {
     <span>
       <LikeButton post={props.post} like={true} />
       <LikeButton post={props.post} like={false} />
-
       <MiscellaneousCountButton buttonURL={`/post/${props.post.id}/comments/`} buttonClass={'btn btn-sm btn-outline-primary'} icon={'comment'} id={`post-comment-count-${props.post.id}`} count={props.post.comments_count} />
-
-      {props.post.post_belongs_to_authenticated_user &&
-        <span>
-          <EditDeleteButtons post={props.post} />
-          <ToggleFormButton post={props.post} formId='comment-on-post' icon='arrow-down' classname='btn-outline-primary' />
-          <EditDeleteCommentForms post={props.post} />
-        </span>
-      }      
+      <EditDeleteCommentButtons post={props.post} />
+      <EditDeleteCommentForms post={props.post} />
     </span>
   );
 }
 
 
-export function EditDeleteButtons(props) {
+export function EditDeleteCommentButtons(props) {
   return (
     <span>
-      <ToggleFormButton post={props.post} formId='edit-post' icon='pencil-alt' classname='btn-outline-primary' />
-      <ToggleFormButton post={props.post} formId='delete-post' icon='trash-alt' classname='btn-outline-danger' />
+      {props.post.post_belongs_to_authenticated_user && 
+        <span>
+          <ToggleFormButton post={props.post} formId='edit-post' icon='pencil-alt' classname='btn-outline-primary' />
+          <ToggleFormButton post={props.post} formId='delete-post' icon='trash-alt' classname='btn-outline-danger' />
+        </span>
+      }
+      <ToggleFormButton post={props.post} formId='comment-on-post' icon='arrow-down' classname='btn-outline-primary' />
     </span>
   )
 }
 
 export function EditDeleteCommentForms(props) {
   return (
-    <span>
-      <TextForm url={`/api/post/${props.post.id}/`} method={'PATCH'} label={<p>Edit post</p>} formClass={'btn-block'} buttonValue={'Edit post'} divClass='hidden my-2 text-left' divId={`edit-post-${props.post.id}`} />
-
-      <DeleteButton post={props.post} />
-
+    <div>
+      {props.post.post_belongs_to_authenticated_user && 
+        <span>
+          <TextForm url={`/api/post/${props.post.id}/`} method={'PATCH'} label={<p>Edit post</p>} formClass={'btn-block'} buttonValue={'Edit post'} divClass='hidden my-2 text-left' divId={`edit-post-${props.post.id}`} />
+          <DeleteButton post={props.post} />
+        </span>
+      }
       <TextForm url={'/api/post/'} method={'POST'} additionalData={{ 'in_reply_to_post': props.post.id }} label={<p>Comment</p>} formClass={'btn-block'} buttonValue={'Comment'} divClass={'hidden my-2 text-left'} divId={`comment-on-post-${props.post.id}`} />
-    </span>
+    </div>
   )
 }

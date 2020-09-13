@@ -1,0 +1,148 @@
+body {
+	background-color: white;
+    color: #1b1919;
+}
+
+ul {
+    list-style-type: none;
+}
+
+textarea {
+    resize: none !important;
+    padding: 10px 25px;
+    border: 1.5px solid #ccc;
+    border-radius: 4px;
+}
+
+.hidden {
+    display: none;
+}
+
+.center{
+    margin: 0 auto;
+    text-align: center;
+}
+
+.homecenter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+img.icon {
+    width: 20px;
+    height: 20px;
+}
+
+.separator {
+    border-top: 1.5px solid #44494a;
+}
+
+.indexPosts {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post {
+    padding: 10px 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.postText {
+    word-wrap: break-word;
+    font-size: 20px;
+    color: #141214;
+}
+
+.postDate {
+    color: rgb(71, 76, 71);
+}
+
+.post-input {
+    height: 100px;
+}
+
+.userInfoCentered {
+    margin: 0 auto;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.userInfoBox {
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 270px;
+}
+
+.userInfoBio {
+    word-wrap: anywhere;
+    overflow-wrap: anywhere;
+    margin-top: 5px;
+    margin-left:-110px;
+    font-style: italic;
+    font-size: 18px;
+}
+
+img.userInfoLocation {
+    height: 10px;
+    width: 10px;
+}
+
+.userInfoPostsMargin {
+    margin-left:-140px;
+}
+
+img.pfp {
+    height: 100px;
+    width: 100px;
+    border-radius: 4%;
+    display: block;
+}
+
+.userPfp {
+    margin-bottom: 100px;
+}
+
+.leftSidebar {
+    width: 15%;
+    background-color:white;
+    position: fixed;
+    height: 100%;
+    border-right: 1.5px solid #44494a;
+    text-align: center !important;
+}
+
+.rightSidebar {
+    margin: 0px;
+    width: 15%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    text-align: left;
+    background-color: white;
+    border-left: 1.5px solid #44494a;
+}
+
+.content {
+    height: 1000px;
+    word-wrap: break-word;
+    text-align: center;
+    padding: 10px;
+}
+
+@media screen and (max-width: 800px) {
+    .left-sidebar {
+        visibility: hidden;
+    }
+    .right-sidebar {
+        visibility: hidden;
+    }
+    .sidebar a {float: left;}
+    div.content {margin-left: 0;}    
+}

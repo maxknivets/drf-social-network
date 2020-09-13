@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames'
+
 import Cookies from 'js-cookie';
 import $ from 'jquery';
-import { Component } from 'react';
+
+import styles from './App.css';
 
 export function ToggleFormButton(props) {
 
@@ -12,7 +15,7 @@ export function ToggleFormButton(props) {
 
   return (
     <button className={`btn btn-sm ${props.classname}`} onClick={handleClick}>
-      <img className='icon' alt={props.icon} src={`/static/icons/${props.icon}.svg`} />
+      <img className={styles.icon} alt={props.icon} src={`/static/icons/${props.icon}.svg`} />
     </button>
   )
 
@@ -59,7 +62,7 @@ export class TextForm extends Component {
         <form onSubmit={this.handleSubmit}>
           <label>
             {this.props.label}
-            <textarea className={`form-control my-3 ${this.props.formClass}`} type='text' value={this.state.value} onChange={this.handleChange} cols='90' rows='3' required />
+            <textarea className={`form-control my-3 ${this.props.formClass}`} type='text' value={this.state.value} onChange={this.handleChange} required />
           </label>
           <button className='form-control btn btn-primary' type='submit'>{this.props.buttonValue}</button>
         </form>
@@ -73,7 +76,7 @@ export function MiscellaneousCountButton(props) {
 
   return (
     <a href={props.buttonURL} className={props.buttonClass}>
-      <img className='icon' alt={props.icon} src={`/static/icons/${props.icon}.svg`} />
+      <img className={styles.icon} alt={props.icon} src={`/static/icons/${props.icon}.svg`} />
       <span id={props.id}> {props.count} </span>
     </a>
   )
@@ -106,7 +109,7 @@ export function LikeButton(props) {
 
   return (
     <button className={`btn btn-sm ${buttonClass}`} onClick={handleClick}>
-      <img className='icon' alt={icon} src={`/static/icons/${icon}.svg`} />
+      <img className={styles.icon} alt={icon} src={`/static/icons/${icon}.svg`} />
       <span id={`${idName}-${props.post.id}`}>{rating}</span>
     </button>
   )
@@ -131,9 +134,33 @@ export function DeleteButton(props) {
   };
 
   return (
-    <div className='hidden my-2 text-left' id={`delete-post-${props.post.id}`}>
+    <div className={classnames(styles.hidden, 'my-2', 'text-left')} id={`delete-post-${props.post.id}`}>
       <button className='btn btn-danger' onClick={handleClick}>Delete Post <br /><small>this action is irreversible</small></button>
     </div>
   )
 
+}
+
+export function FollowButton(props) {
+  function onClick() {
+    fetch(`/api/follow/${props.profileId}/`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': Cookies.get('sessionid'),
+      },
+    })
+      .then(response => { return response.json() })
+      .then(data => { 
+        $("#follow-status").text(data.status);
+        $("#followers").text(data.count);
+      })
+  }
+
+  return (
+    <button className="btn btn-primary btn-sm" onClick={onClick}>
+      <span id="follow-status">
+        {props.followStatus}
+      </span>
+    </button>
+  )
 }

@@ -16,3 +16,11 @@ def profile_page(request, id):
 @login_required(login_url="/login/", redirect_field_name=None)
 def settings_page(request):
     return render(request, 'frontend/app.html', {})
+
+@login_required(login_url="/login/", redirect_field_name=None)
+def followers_page(request, id):
+    return render(request, 'frontend/app.html', {})
+
+@login_required(login_url="/login/", redirect_field_name=None)
+def following_page(request, id):
+    return render(request, 'frontend/app.html', {})

@@ -1,24 +1,82 @@
-import React from 'react';
+import React, { Component, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Component, useState, useEffect } from 'react';
+
+import Cookies from 'js-cookie';
+import classnames from 'classnames'
+import styles from './App.css';
 
 export function Settings(props) {
   return (
     <div>
-      <MultipleTextForms />
+      <Form />
+    </div>
+  )
+}
+function Form() {
+  const [state, setState] = useState({
+    first_name: "",
+    last_name: "",
+    bio: "",
+    location: "",
+  })
+  function handleChange(event) {
+    const value = event.target.value;
+    setState({
+      ...state,
+      [event.target.name]: value
+    });
+  };
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    fetch(`/api/profile/`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': Cookies.get('sessionid'),
+        'X-CSRFToken': Cookies.get('csrftoken')
+      },
+      method: 'PATCH',
+      body: JSON.stringify(state)
+    })
+      .then(response => { return response.json() })
+      .then(data => setState({ fetchData: data }))
+  }
+
+  return (
+    <div className={styles.homecenter}>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Your first name
+          <textarea name="firstName" className={`form-control my-3`} value={state.firstName} onChange={handleChange} />
+        </label>
+        <br />
+        <label>
+          Your second name
+          <textarea name="secondName" className={`form-control my-3`} value={state.secondName} onChange={handleChange} />
+        </label>
+        <br />
+        <label>
+          Your bio
+          <textarea name="bio" className={`form-control my-3`} value={state.bio} onChange={handleChange} />
+        </label>
+        <br />
+        <label>
+          Your location
+          <textarea name="location" className={`form-control my-3`} value={state.location} onChange={handleChange} />
+        </label>
+        <button className='form-control btn btn-primary' type='submit'>Change</button>
+      </form>
     </div>
   )
 }
 
-export class MultipleTextForms extends Component { // not making this a reusable component because no need + time consuming
+export class ProfileChangeForms extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
       firstName: "",
       lastName: "",
-      bio: "",
-      location: "",
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -26,9 +84,9 @@ export class MultipleTextForms extends Component { // not making this a reusable
 
   handleChange(event) {
     const value = event.target.value;
-    setState({
+    this.setState({
       ...this.state,
-      [evt.target.name]: value
+      [event.target.name]: value
     });
   };
 
@@ -49,20 +107,23 @@ export class MultipleTextForms extends Component { // not making this a reusable
 
   render() {
     return (
-      <div>
+      <div className={styles.homecenter}>
         <form onSubmit={this.handleSubmit}>
           <label>
             Your first name
             <textarea className={`form-control my-3`} type='text' value={this.state.firstName} onChange={this.handleChange} cols='90' rows='3' required />
           </label>
+          <br />
           <label>
             Your second name
             <textarea className={`form-control my-3`} type='text' value={this.state.secondName} onChange={this.handleChange} cols='90' rows='3' required />
           </label>
+          <br />
           <label>
             Your bio
             <textarea className={`form-control my-3`} type='text' value={this.state.bio} onChange={this.handleChange} cols='90' rows='3' required />
           </label>
+          <br />
           <label>
             Your location
             <textarea className={`form-control my-3`} type='text' value={this.state.location} onChange={this.handleChange} cols='90' rows='3' required />

@@ -42,18 +42,6 @@ body {
     div.content {margin-left: 0;}    
 }
 
-.center{
-    margin: 0 auto;
-    text-align: center;
-}
-
-.homecenter {
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .userinfo-centered {
     margin: 0 auto;
     text-align: left;
@@ -140,12 +128,23 @@ img.pfp {
     display: block;
 }
 
+.center{
+    margin: 0 auto;
+    text-align: center;
+}
+
+.homecenter {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .index-posts {
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 16.35%;
 }
 
 .comment-separator {
@@ -163,10 +162,6 @@ img.pfp {
     word-wrap: break-word;
     font-size: 20px;
     color: #141214;
-    text-align: left;
-}
-
-.post-header {
     text-align: left;
 }
 
