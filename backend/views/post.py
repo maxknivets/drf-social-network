@@ -1,78 +1,45 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from django.utils import timezone
 
 from backend.models import User, Post, PostRate
-from backend.serializers import PostListSerializer, PostSerializer, PostRateSerializer
+from backend.serializers import PostSerializer, PostRateSerializer
+from backend.permissions import IsPostOwner
 
-from rest_framework import generics, viewsets, mixins, generics
-from rest_framework.views import APIView
+from rest_framework import generics, viewsets, mixins, permissions
+from rest_framework.decorators import action
 
-class PostList(generics.ListAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostListSerializer
-
-    def get_queryset(self):
-        return Post.objects.filter(in_reply_to_post=None)
-
-class CommentList(generics.ListAPIView):
-    serializer_class = PostListSerializer
+class PostViewSet(viewsets.ModelViewSet):
     
-    def get_queryset(self):
-        return Post.objects.filter(in_reply_to_post=self.kwargs["pk"])
-
-class CommentCount(APIView):
-
-    def get(self, request, pk):
-        comment_count = Post.objects.filter(in_reply_to_post=pk).count()
-        return JsonResponse({'comment_count': comment_count})
-
-class PostGet(mixins.RetrieveModelMixin, generics.GenericAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostListSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-class PostDetail(mixins.CreateModelMixin,
-                                mixins.UpdateModelMixin,
-                                mixins.DestroyModelMixin,
-                                generics.GenericAPIView):
-    queryset = Post.objects.all()
     serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    permission_classes = [permissions.IsAuthenticated, IsPostOwner]
 
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    @action(detail=False, methods=['GET'], name='Get comments')
+    def list_comments(self, request, *args, **kwargs):
+        queryset = Post.objects.filter(in_reply_to_post = self.kwargs["pk"])
+        serializer = self.get_serializer(queryset)
+        return Response(serializer.data)
 
-    def post(self, request, *args, **kwargs):
-        request.data["posted_by"] = self.request.user.pk
-        return self.create(request, *args, **kwargs) 
+    def get_queryset(self):
+        if self.action == 'list':
+            return Post.objects.filter(in_reply_to_post = None).order_by('-pub_date')
+        return Post.objects.order_by('-pub_date')
 
-    def put(self, request, *args, **kwargs):
-        #check whether the user in post is the same as in request
-        return self.update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        #check whether the user in post is the same as in request
-        return self.destroy(request, *args, **kwargs)
-
-class PostRating(APIView):
-
-    def get(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
-        data = {
-            'total_likes': PostRate.objects.filter(liked=True, rated_post=post).count(),
-            'total_dislikes': PostRate.objects.filter(liked=False, rated_post=post).count()
-        }
-        return JsonResponse(data)
-
-class RatePost(generics.GenericAPIView):
+class PostRateViewSet(generics.GenericAPIView): # use mixins instead
     queryset = PostRate.objects.all()
     serializer_class = PostRateSerializer
 
+    def get(self, request, pk):
+        post = get_object_or_404(Post, pk = pk)
+        data = {
+            'likes_count': PostRate.objects.filter(liked = True, rated_post = post).count(), 
+            'dislikes_count': PostRate.objects.filter(liked = False, rated_post = post).count()
+        }
+        return JsonResponse(data)
+
     def post(self, request, *args, **kwargs):
-        post = get_object_or_404(Post, pk=request.data["rated_post"]["id"])
-        post_rating = PostRate.objects.filter(rated_by=request.user, rated_post=post).first()
+        post = get_object_or_404(Post, pk = request.data["rated_post"]["id"])
+        post_rating = PostRate.objects.filter(rated_by = request.user, rated_post = post).first()
         user_liked_post = request.data["liked"]
 
         if post_rating:
@@ -87,47 +54,18 @@ class RatePost(generics.GenericAPIView):
                 else:
                     post_rating.liked = False                    
         else:
-            post_rating = PostRate(liked=user_liked_post, rated_by=request.user, rated_post=post)
+            post_rating = PostRate(liked = user_liked_post, rated_by = request.user, rated_post = post)
 
         post_rating.save()
 
         data = {
-            'total_likes': PostRate.objects.filter(liked=True, rated_post=post).count(),
-            'total_dislikes': PostRate.objects.filter(liked=False, rated_post=post).count()
+            'total_likes': PostRate.objects.filter(liked = True, rated_post = post).count(), 
+            'total_dislikes': PostRate.objects.filter(liked = False, rated_post = post).count()
         }
         return JsonResponse(data)
 
-
-"""
-class WriteComment(generics.CreateAPIView):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-    
-    def perform_create(self, serializer):
-        serializer.save(post=Post.objects.filter(pk=self.request.data.get('post')).first())
-        serializer.save(posted_by=self.request.user)
-
-class RetrieveComments(generics.ListAPIView):
-    serializer_class = PostListSerializer
-    lookup_field='pk'
+class CommentList(generics.ListAPIView): # turn this into a method in postviewset
+    serializer_class = PostSerializer
     
     def get_queryset(self):
-        post = Post.objects.get(pk=self.kwargs.get(self.lookup_field))
-        comments = Comment.objects.filter(post=post)
-        return comments
-
-class CommentCount(APIView):
-
-    def get(self, request, post_id):
-        post = get_object_or_404(Post, pk=post_id)
-        data = {
-            'comment_count': post.comment_set.all().count(),
-        }
-        return JsonResponse(data)
-
-def commentedit(request):
-    return redirect('/')
-
-def commentdelete(request):
-    return redirect('/')
-"""
+        return Post.objects.filter(in_reply_to_post = self.kwargs["pk"])

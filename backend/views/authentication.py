@@ -2,8 +2,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from backend.models import User
+from backend.models import User, Profile
 from rest_framework.authtoken.models import Token
+from ..forms import Sign_up_form
 
 def signup(request):
     if request.user.is_authenticated:
@@ -14,8 +15,8 @@ def signup(request):
             form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            profile = Profile(user=user)
+            user = authenticate(username = username, password = raw_password)
+            profile = Profile(user = user)
             profile.save()
             login(request, user)
             return redirect('/')
@@ -27,10 +28,11 @@ def logout(request):
     logout(request)
     return redirect('/login')
 
+# Ajax endpoint to check if the user is already taken, only used in the signup template
 def validate_username(request):
     username = request.GET.get('username', None)
     data = {
-        'is_taken': User.objects.filter(username__iexact=username).exists()
+        'is_taken': User.objects.filter(username__iexact = username).exists()
     }
     return JsonResponse(data)
 
