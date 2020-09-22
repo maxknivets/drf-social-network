@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import Cookies from 'js-cookie';
 import classnames from 'classnames'
@@ -50,8 +50,7 @@ export function Profile(props) {
           </div>
 
           <div>
-            { userInfo.first_name }
-            { userInfo.last_name }
+            { userInfo.first_name } { userInfo.last_name }
           </div>
 
           <div>
@@ -65,6 +64,7 @@ export function Profile(props) {
 
           <div>
             following: <a href={`/following/${ userInfo.user_id }`} id="following">{ userInfo.following_count }</a>
+            <br />
             followers: <a href={`/followers/${ userInfo.user_id }`} id="followers">{ userInfo.followers_count }</a>
           </div>
 

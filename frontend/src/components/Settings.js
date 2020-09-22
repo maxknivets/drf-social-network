@@ -47,12 +47,12 @@ function Form() {
       <form onSubmit={handleSubmit}>
         <label>
           Your first name
-          <textarea name="firstName" className={`form-control my-3`} value={state.firstName} onChange={handleChange} />
+          <textarea name="first_name" className={`form-control my-3`} value={state.first_name} onChange={handleChange} />
         </label>
         <br />
         <label>
           Your second name
-          <textarea name="secondName" className={`form-control my-3`} value={state.secondName} onChange={handleChange} />
+          <textarea name="last_name" className={`form-control my-3`} value={state.last_name} onChange={handleChange} />
         </label>
         <br />
         <label>

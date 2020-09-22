@@ -69,7 +69,7 @@ export function QuerySinglePost(props) {
   }, [])
 
   return (
-    <div className={styles.indexPosts}>
+    <div className={styles.homecenter}>
       <Post props={undefined} post={post} />
     </div>
   )

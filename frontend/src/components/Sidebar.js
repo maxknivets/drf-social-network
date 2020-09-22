@@ -1,12 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import classnames from 'classnames'
 
 import styles from './App.css';
+import Cookies from 'js-cookie';
 
 export function Sidebar() {
-  var placeholder = 1
-  
+
+  const [currentAuthenticatedUserId, setCurrentAuthenticatedUserId] = useState(1);
+
+  useEffect(() => {
+    fetch(`/api/get-current-authenticated-user-id/`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': Cookies.get('sessionid'),
+      },
+    })
+      .then(response => { return response.json() })
+      .then(data => { setCurrentAuthenticatedUserId(data.current_authenticated_user_id) })
+  }, [])
+
   return (
     <div className="sidebars">
       <div className={styles.leftSidebar}>
@@ -16,7 +28,7 @@ export function Sidebar() {
               <br />
               <a className="btn btn-primary btn-block" href="/" role="button">Home</a>
               <br />
-              <a className="btn btn-primary btn-block" href={`/profile/${placeholder}`} role="button">Your profile</a>
+              <a className="btn btn-primary btn-block" href={`/profile/${currentAuthenticatedUserId}`} role="button">Your profile</a>
               <br />
               <a className="btn btn-primary btn-block" href="/settings" role="button">Settings</a>
               <br />

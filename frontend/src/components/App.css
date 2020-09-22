@@ -38,13 +38,6 @@ img.icon {
     border-top: 1.5px solid #44494a;
 }
 
-.indexPosts {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .post {
     padding: 10px 20px;
     margin-top: 20px;
@@ -105,7 +98,7 @@ img.pfp {
 }
 
 .userPfp {
-    margin-bottom: 100px;
+    margin-bottom: 50px;
 }
 
 .leftSidebar {

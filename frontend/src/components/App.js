@@ -7,9 +7,7 @@ import { Comments } from './Comments';
 import { Sidebar } from './Sidebar';
 import { Settings } from './Settings';
 import { Profile } from './Profile';
-import { Followers } from './Followers'
-import { Following } from './Following'
-
+import { UserList } from './UserList';
 
 function App() {
   return (
@@ -21,8 +19,8 @@ function App() {
           <Route path='/post/:id/comments/' component={Comments} exact />
           <Route path='/settings/' component={Settings} exact />
           <Route path='/profile/:id/' component={Profile} exact />
-          <Route path='/followers/:id/' component={Followers} exact />
-          <Route path='/following/:id/' component={Following} exact />
+          <Route path='/followers/:id/' render={(props) => (<UserList {...props} followers={true} />)} exact />
+          <Route path='/following/:id/' render={(props) => (<UserList {...props} followers={false} />)} exact />
 
           <Route component={Error} />
         </Switch>
