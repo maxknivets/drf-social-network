@@ -1,5 +1,5 @@
 Django==2.2.9
-djangorestframework==3.11.1
+djangorestframework==3.11.2
 django-cors-headers==3.2.1
 django-currentuser==0.5.1
 Pillow==7.0.0
