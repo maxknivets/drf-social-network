@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django_currentuser.db.models import CurrentUserField
 from django_currentuser.middleware import get_current_authenticated_user
 
+
 # A primitive extension of the standard User table from Django lib
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -33,6 +34,7 @@ class Profile(models.Model):
         
     def __str__(self):
         return str(self.user)
+
 
 class Post(models.Model):
     text = models.CharField(max_length=200)
@@ -66,6 +68,7 @@ class Post(models.Model):
     def __str__(self):
         return str(self)
 
+
 class PostRate(models.Model):
     liked = models.BooleanField(null=True)
     rated_post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -73,6 +76,7 @@ class PostRate(models.Model):
     
     def __str__(self):
         return str(self.rated_post)
+
 
 class Follower(models.Model): #rename model to UserFollows or find a better name
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
