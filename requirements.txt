@@ -1,4 +1,4 @@
-Django==2.2.19
+Django==2.2.22
 djangorestframework==3.12.4
 django-cors-headers==3.7.0
 django-currentuser==0.5.2
